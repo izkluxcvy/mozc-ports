@@ -78,6 +78,10 @@ mozc_library(system/system_dictionary_builder.cc
         mozc::base::file_stream
         mozc::base::file_util
 )
+mozc_library(pos_id_map.cc
+    DEPENDS
+    absl::strings
+)
 mozc_library(dictionary_impl.cc
     DEPENDS
     mozc::protocol::protocol

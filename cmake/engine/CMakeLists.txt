@@ -9,6 +9,7 @@ mozc_library(modules.cc DEPENDS
     mozc::prediction::single_kanji_decoder
     mozc::dictionary::user_pos
     mozc::dictionary::user_dictionary
+    mozc::dictionary::pos_id_map
     mozc::dictionary::suffix_dictionary
     mozc::dictionary::dictionary_impl
     mozc::dictionary::system::system_dictionary
