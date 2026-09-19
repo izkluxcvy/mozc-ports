@@ -27,114 +27,53 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# String manipulation and character classification libraries.
-
 load(
     "//:build_defs.bzl",
     "mozc_cc_library",
     "mozc_cc_test",
-    "mozc_select",
 )
 
 package(default_visibility = ["//:__subpackages__"])
 
 mozc_cc_library(
-    name = "assign",
-    hdrs = ["assign.h"],
-    deps = ["@com_google_absl//absl/strings"],
-)
-
-mozc_cc_test(
-    name = "assign_test",
-    srcs = ["assign_test.cc"],
-    deps = [
-        ":assign",
-        "//testing:gunit_main",
-        "@com_google_absl//absl/strings",
+    name = "reversed_view",
+    hdrs = [
+        "reversed_view.h",
+        "reversed_view_internal.h",
     ],
-)
-
-mozc_cc_library(
-    name = "pfchar",
-    hdrs = ["pfchar.h"],
-    deps = [
-        "@com_google_absl//absl/strings",
-    ] + mozc_select(
-        windows = ["//base/win32:wide_char"],
-    ),
-)
-
-mozc_cc_test(
-    name = "pfchar_test",
-    size = "small",
-    srcs = ["pfchar_test.cc"],
-    deps = [
-        ":pfchar",
-        "//testing:gunit_main",
-        "@com_google_absl//absl/strings",
-    ],
-)
-
-mozc_cc_library(
-    name = "japanese",
-    srcs = [
-        "japanese.cc",
-    ],
-    hdrs = ["japanese.h"],
     visibility = ["//:__subpackages__"],
     deps = [
-        "//base/strings/internal:double_array",
-        "//base/strings/internal:japanese_rules",
-        "@com_google_absl//absl/strings",
     ],
 )
 
 mozc_cc_test(
-    name = "japanese_test",
+    name = "reversed_view_test",
     size = "small",
-    srcs = [
-        "japanese_test.cc",
-    ],
+    srcs = ["reversed_view_test.cc"],
     deps = [
-        ":japanese",
+        ":reversed_view",
         "//testing:gunit_main",
-        "@com_google_absl//absl/strings:string_view",
+        "@com_google_absl//absl/strings",
     ],
 )
 
 mozc_cc_library(
-    name = "unicode",
-    srcs = ["unicode.cc"],
-    hdrs = ["unicode.h"],
+    name = "varint",
+    hdrs = [
+        "varint.h",
+        "varint_internal.h",
+    ],
+    visibility = ["//:__subpackages__"],
     deps = [
-        "//base/strings/internal:utf8_internal",
-        "@com_google_absl//absl/base:core_headers",
-        "@com_google_absl//absl/base:nullability",
-        "@com_google_absl//absl/log:check",
-        "@com_google_absl//absl/strings",
     ],
 )
 
 mozc_cc_test(
-    name = "unicode_benchmark_test",
+    name = "varint_test",
     size = "small",
-    srcs = ["unicode_benchmark_test.cc"],
-    tags = ["manual"],
+    srcs = ["varint_test.cc"],
     deps = [
-        ":unicode",
+        ":varint",
         "//testing:gunit_main",
-        "@com_google_absl//absl/strings",
-    ],
-)
-
-mozc_cc_test(
-    name = "unicode_test",
-    size = "small",
-    srcs = ["unicode_test.cc"],
-    deps = [
-        ":unicode",
-        "//testing:gunit_main",
-        "@com_google_absl//absl/algorithm:container",
-        "@com_google_absl//absl/strings",
     ],
 )

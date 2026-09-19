@@ -86,11 +86,13 @@ mozc_cc_library(
         "//session:__pkg__",
     ],
     deps = [
+        ":attribute",
         ":inner_segment",
         ":segments",
         "//base/strings:assign",
         "//prediction:result",
         "//request:conversion_request",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/strings",
     ],
@@ -101,6 +103,7 @@ mozc_cc_test(
     size = "small",
     srcs = ["converter_util_test.cc"],
     deps = [
+        ":attribute",
         ":converter_util",
         ":inner_segment",
         ":segments",
@@ -278,8 +281,20 @@ mozc_cc_library(
     deps = [
         ":connector",
         "//dictionary:pos_matcher",
-        "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/log:check",
+    ],
+)
+
+mozc_cc_test(
+    name = "caching_connector_test",
+    srcs = ["caching_connector_test.cc"],
+    deps = [
+        ":caching_connector",
+        ":connector",
+        "//data_manager/testing:mock_data_manager",
+        "//dictionary:pos_matcher",
+        "//engine:modules",
+        "//testing:gunit_main",
     ],
 )
 

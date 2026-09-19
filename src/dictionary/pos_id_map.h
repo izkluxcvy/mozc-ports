@@ -27,42 +27,55 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
-#define MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
+#ifndef MOZC_DICTIONARY_POS_ID_MAP_H_
+#define MOZC_DICTIONARY_POS_ID_MAP_H_
 
+#include <cstddef>
 #include <cstdint>
-#include <string>
 #include <vector>
 
-#include "absl/base/attributes.h"
 #include "absl/strings/string_view.h"
-#include "dictionary/pos_matcher.h"
-#include "dictionary/single_kanji_dictionary.h"
-#include "prediction/result.h"
-#include "request/conversion_request.h"
 
-namespace mozc::prediction {
+namespace mozc::dictionary {
 
-class SingleKanjiDecoder {
+// Manages POS ID to POS string mappings.
+// Typically initialized with the content of 'pos_id_map.data' packaged in
+// mozc.data.
+//
+// Binary format:
+// Null-separated UTF-8 strings. The N-th null-separated token corresponds to
+// POS ID N.
+class PosIdMap {
  public:
-  SingleKanjiDecoder(
-      const dictionary::PosMatcher& pos_matcher ABSL_ATTRIBUTE_LIFETIME_BOUND,
-      const dictionary::SingleKanjiDictionary& single_kanji_dictionary
-          ABSL_ATTRIBUTE_LIFETIME_BOUND);
-  virtual ~SingleKanjiDecoder();
+  // Initializes the map from serialized binary data.
+  // If the data is invalid or empty, it initializes an empty map.
+  //
+  // NOTE: The buffer `pos_id_map_data` must outlive the `PosIdMap` instance
+  // because the internal table holds `absl::string_view` pointing directly
+  // into the buffer.
+  explicit PosIdMap(absl::string_view pos_id_map_data);
 
-  virtual std::vector<Result> Decode(const ConversionRequest& request) const;
+  PosIdMap(const PosIdMap&) = delete;
+  PosIdMap& operator=(const PosIdMap&) = delete;
+
+  ~PosIdMap() = default;
+
+  // Returns the POS string corresponding to the given POS ID.
+  // Returns an empty string view if the POS ID is invalid or not found.
+  // Example: 12 -> "副詞,一般,*,*,*,*,*"
+  // NOTE: The returned string view points to the buffer provided to the
+  // constructor. It must not outlive the buffer.
+  absl::string_view GetPosString(uint16_t pos_id) const;
+
+  // Returns the total number of POS IDs.
+  size_t GetPosIdCount() const;
 
  private:
-  void AppendResults(absl::string_view kanji_key,
-                     absl::string_view original_request_key,
-                     std::vector<std::string> kanji_list, int offset,
-                     std::vector<Result>* results) const;
-
-  const dictionary::SingleKanjiDictionary& single_kanji_dictionary_;
-  const uint16_t general_symbol_id_ = 0;
+  // Maps POS ID to POS string.
+  // The index is the POS ID.
+  std::vector<absl::string_view> pos_id_to_string_table_;
 };
 
-}  // namespace mozc::prediction
+}  // namespace mozc::dictionary
 
-#endif  // MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
+#endif  // MOZC_DICTIONARY_POS_ID_MAP_H_

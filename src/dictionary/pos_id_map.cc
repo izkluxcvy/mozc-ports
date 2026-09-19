@@ -27,42 +27,33 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
-#define MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
+#include "dictionary/pos_id_map.h"
 
+#include <cstddef>
 #include <cstdint>
-#include <string>
 #include <vector>
 
-#include "absl/base/attributes.h"
+#include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
-#include "dictionary/pos_matcher.h"
-#include "dictionary/single_kanji_dictionary.h"
-#include "prediction/result.h"
-#include "request/conversion_request.h"
 
-namespace mozc::prediction {
+namespace mozc::dictionary {
 
-class SingleKanjiDecoder {
- public:
-  SingleKanjiDecoder(
-      const dictionary::PosMatcher& pos_matcher ABSL_ATTRIBUTE_LIFETIME_BOUND,
-      const dictionary::SingleKanjiDictionary& single_kanji_dictionary
-          ABSL_ATTRIBUTE_LIFETIME_BOUND);
-  virtual ~SingleKanjiDecoder();
+PosIdMap::PosIdMap(absl::string_view pos_id_map_data) {
+  if (pos_id_map_data.empty()) {
+    return;
+  }
+  pos_id_to_string_table_ = absl::StrSplit(pos_id_map_data, '\0');
+}
 
-  virtual std::vector<Result> Decode(const ConversionRequest& request) const;
+absl::string_view PosIdMap::GetPosString(uint16_t pos_id) const {
+  if (pos_id >= pos_id_to_string_table_.size()) {
+    return absl::string_view();
+  }
+  return pos_id_to_string_table_[pos_id];
+}
 
- private:
-  void AppendResults(absl::string_view kanji_key,
-                     absl::string_view original_request_key,
-                     std::vector<std::string> kanji_list, int offset,
-                     std::vector<Result>* results) const;
+size_t PosIdMap::GetPosIdCount() const {
+  return pos_id_to_string_table_.size();
+}
 
-  const dictionary::SingleKanjiDictionary& single_kanji_dictionary_;
-  const uint16_t general_symbol_id_ = 0;
-};
-
-}  // namespace mozc::prediction
-
-#endif  // MOZC_PREDICTION_SINGLE_KANJI_DECODER_H_
+}  // namespace mozc::dictionary
